@@ -5,12 +5,13 @@
 const int boardSize = 4;
 int score = 0;
 
-const std::string art[] = {"\033[1;33m██████   ██████  ██   ██  █████  \n"
-                           "     ██ ██  ████ ██   ██ ██   ██ \n"
-                           " █████  ██ ██ ██ ███████  █████  \n"
-                           "██      ████  ██      ██ ██   ██ \n"
-                           "███████  ██████       ██  █████  \033[0m\n"
-                           "					By: Dariormt\n"};
+const std::string art[] = {
+    "\033[1;33m██████   ██████  ██   ██  █████  \n"
+    "     ██ ██  ████ ██   ██ ██   ██ \n"
+    " █████  ██ ██ ██ ███████  █████  \n"
+    "██      ████  ██      ██ ██   ██ \n"
+    "███████  ██████       ██  █████  \033[0m\n"
+    "					By: Dariormt\n"};
 
 std::string ColorParser(int numb) { // parses color depending on num
   switch (numb) {
