@@ -2,44 +2,23 @@
 #include <thread>
 #include <vector>
 
+#include "graphics.hpp"
+
 // variables
 int boardSize = 4;      // if i do a vector of vectors, i can do this, yay!!
                         //  size, but array of an array dosn't like it
 int startingPieces = 2; // Customize easyly
 int piecesToSpawn = 1;
+int numberToGet = 2048;
 
 int score = 0;
 int maxscore = 3950; // hard-coded highscore it works for now
 
+int moves = 0;
+
 // bool retry = true; //fuck the compiler, why does an int work and a bool not
 
 int state = 1; // current game state 1 replay, 0 exit;
-
-const std::string art[] = {                         // art thingis
-    "\033[1;33m██████   ██████  ██   ██  █████  \n" // 0
-    "     ██ ██  ████ ██   ██ ██   ██ \n"
-    " █████  ██ ██ ██ ███████  █████  \n"
-    "██      ████  ██      ██ ██   ██ \n"
-    "███████  ██████       ██  █████  \033[0m\n"
-    "			By: Dario Rodriguez\n\n",
-    "__   __ _____  _   _     _    _  _____  _   _   _ \n" // 1
-    "\\ \\ / /|  _  || | | |   | |  | ||_   _|| \\ | | | |\n"
-    " \\ V / | | | || | | |   | |  | |  | |  |  \\| | | |\n"
-    "  \\ /  | | | || | | |   | |/\\| |  | |  | . ` | | |\n"
-    "  | |  \\ \\_/ /| |_| |   \\  /\\  / _| |_ | |\\  | |_|\n"
-    "  \\_/   \\___/  \\___/     \\/  \\/  \\___/ \\_| \\_/ (_)\n\n",
-    " ______     ______     __    __     ______        ______     __   __  "
-    " "
-    "______     ______    \n"
-    "/\\  ___\\   /\\  __ \\   /\\ '-./  \\   /\\  ___\\      /\\  __ \\   "
-    "/\\ " // 2
-    "\\ / /  /\\  ___\\   /\\  == \\   \n"
-    "\\ \\ \\__ \\  \\ \\  __ \\  \\ \\ \\-./\\ \\  \\ \\  __\\      \\ \\ "
-    "\\/\\ \\  \\ \\ \' /   \\ \\  __\\   \\ \\  __<   \n"
-    " \\ \\_____\\  \\ \\_\\ \\_\\  \\ \\_\\ \\ \\_\\  \\ \\_____\\     \\ "
-    "\\_____\\  \\ \\__|    \\ \\_____\\  \\ \\_\\ \\_\\ \n"
-    "  \\/_____/   \\/_/\\/_/   \\/_/  \\/_/   \\/_____/      \\/_____/   "
-    "\\/_/      \\/_____/   \\/_/ /_/ \n\n"};
 
 std::string ColorParser(
     int numb) { // parses color depending on num using ascii color escapes
@@ -81,7 +60,7 @@ std::string ColorParser(
     return "\033[1;97m2048\033[0m";
     break;
   default:
-    return "!"; // wtf
+    return std::to_string(numb);
     break;
   }
 }
@@ -218,7 +197,7 @@ void DrawSeparation(int h) { // implements procedural box gen
     std::cout << "───┘\n";
     break;
   default:
-    std::cout << "┼───┼───┼───┼───┼\n"; // end line
+    std::cout << "!!!!!!!!!!!!!!!!\n"; // end line
     break;
   }
 }
@@ -230,7 +209,8 @@ void DrawGame(std::vector<std::vector<int>> &board) { // Board Drawing
   // Draw Cover
   std::cout << art[0];
 
-  std::cout << "Score: " << score << "  |  Highscore: " << maxscore << '\n';
+  std::cout << "Score: " << score << "  |  Highscore: " << maxscore
+            << "  |  Moves: " << moves << '\n';
 
   for (int i = 0; i < boardSize; i++) {
     if (i == 0) { // create box initial separation
@@ -273,7 +253,7 @@ bool IsGameOverState(std::vector<std::vector<int>> &board) {
 bool IsWinState(std::vector<std::vector<int>> &board) {
   for (int i = 0; i < boardSize; i++) {
     for (int j = 0; j < boardSize; j++) {
-      if (board[i][j] == 2048) { // if contains numb
+      if (board[i][j] == numberToGet) { // if contains numb
         return true;
       }
     }
@@ -433,6 +413,7 @@ void DoInput(std::vector<std::vector<int>> &board) {
   }
 
   if (moved) {
+    moves++;
     SpawnTile(board, piecesToSpawn);
     DrawGame(board);
   } else {
@@ -480,6 +461,15 @@ void InitialSetup() { // unused
     } else if (piecesToSpawn < 1) {
       piecesToSpawn = 1;
     }
+
+    std::cout
+        << "Piece to get, min 16 - max 8192 (default 2048) multiple of 2!: ";
+    std::cin >> numberToGet;
+    if (numberToGet > 8192) {
+      numberToGet = 8192;
+    } else if (numberToGet < 16) {
+      numberToGet = 16;
+    }
     return;
     break;
   }
@@ -489,8 +479,9 @@ void CheckHighscore() { // simple thingi
   if (score > maxscore) {
     std::cout << "New highscore: " << score << '\n';
     maxscore = score;
-    score = 0;
   }
+  score = 0;
+  moves = 0;
 }
 
 void MainGame() {
@@ -544,7 +535,7 @@ void MainGame() {
 }
 
 int main() {
-  while (true) { // retry loop
+  while (true) { // retry loop fuck the compiler
     if (state != 0) {
       MainGame();
     } else {
